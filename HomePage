@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'todoList.dart'; // Import the TodoList widget
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  TextEditingController todoListEditingController = TextEditingController();
+
+  // List of tasks with their name and completion status
+  List<List<dynamic>> toDoList = [
+    ["fajarTime", false],
+    ["BreakFastTime", false],
+    ["SchoolTime", false],
+    ["lunchTime", false],
+    ["studyTime", false],
+    ["ChaiTime", false],
+    ["reviganTIME", false],
+    ["DinnerTime", false],
+  ];
+
+  // Handle checkbox toggle
+  void checkBoxChanged(int index) {
+    setState(() {
+      toDoList[index][1] = !toDoList[index][1]; // Toggle completion status
+    });
+  }
+
+  // Add a new task
+  void addTask() {
+    if (todoListEditingController.text.isNotEmpty) {
+      setState(() {
+        toDoList.add([todoListEditingController.text, false]);
+        todoListEditingController.clear(); // Clear input field after adding
+      });
+    }
+  }
+
+  // Delete a task from the list
+  void deleteTask(int index) {
+    setState(() {
+      toDoList.removeAt(index); // Remove task at given index
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 148, 123, 194),
+      // AppBar
+      appBar: AppBar(
+        title: const Center(
+          child: Text("ToDoApp"),
+        ),
+        backgroundColor: const Color(0xFF754DBA),
+        foregroundColor: Colors.white,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: Colors.deepPurple),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600'),
+                ),
+                accountName: Text("Noshaba"),
+                accountEmail: Text("gamail.com")),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("Page 1"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.home_outlined),
+              title: Text("Page 2"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
+              },
+            )
+          ],
+        ),
+      ),
+
+      // BODY
+      body: ListView.builder(
+        itemCount: toDoList.length,
+        itemBuilder: (context, index) {
+          return TodoList(
+            taskName: toDoList[index][0],
+            taskComplet: toDoList[index][1],
+            index: index,
+            onChanged: (value) => checkBoxChanged(index),
+            onUpdate: (newTaskName) {
+              setState(() {
+                toDoList[index][0] = newTaskName; // Update task name
+              });
+            },
+            onDelete: (index) => deleteTask(index), // Handle task deletion
+          );
+        },
+      ),
+
+      //FloatingActionButton
+      floatingActionButton: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                controller: todoListEditingController,
+                decoration: InputDecoration(
+                  hintText: "Add New Task",
+                  filled: true,
+                  fillColor: Colors.deepPurple.shade100,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.deepPurple),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.deepPurple),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          FloatingActionButton(
+            onPressed: addTask,
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+}
