@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+
+class TodoList extends StatefulWidget {
+  const TodoList({
+    super.key,
+    required this.taskName,
+    required this.taskComplet,
+    required this.index,
+    required this.onChanged,
+    required this.onUpdate,
+    required this.onDelete,
+  });
+
+  final String taskName;
+  final bool taskComplet;
+  final int index;
+  final Function(bool?)? onChanged;
+  final Function(String)? onUpdate;
+  final Function(int)? onDelete;
+
+  @override
+  State<TodoList> createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> {
+  TextEditingController updateTaskController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                //chackbox
+                Checkbox(
+                  value: widget.taskComplet,
+                  onChanged: widget.onChanged,
+                  checkColor: Colors.black,
+                  activeColor: Colors.white,
+                  side: const BorderSide(color: Colors.white),
+                ),
+                Container(
+                  width: 150,
+                  child: Text(
+                    widget.taskName,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        decoration: widget.taskComplet
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        decorationColor: Color.fromRGBO(33, 27, 27, 1)),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                // Update Task
+                InkWell(
+                  onTap: () {
+                    updateTaskController.text = widget.taskName;
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Update Task"),
+                          content: TextField(
+                            controller: updateTaskController,
+                            decoration:
+                                const InputDecoration(hintText: "Update Task"),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                widget.onUpdate!(updateTaskController.text);
+                                updateTaskController.clear();
+                                Navigator.pop(context);
+                              },
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: const Icon(Icons.more_vert, color: Colors.white),
+                ),
+                const SizedBox(width: 10),
+                // Delete Task
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Delete Task"),
+                          content: const Text(
+                              "Are you sure you want to delete this task?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                widget.onDelete!(widget.index);
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Yes"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("No"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
